@@ -14,7 +14,7 @@ Calibrates both sensors to line, background
 Updated 9/10/2007  NXT hardware
 @author Roger Glassey
  */
-public class Tracker
+public class Tracker0
 {
 
   /**
@@ -29,10 +29,6 @@ public class Tracker
    *set by constructor , used by trackline()
    */
   private LightSensor rightEye;
-  /**
-   * scaled lightSensor value for marker; used by atMarker()
-   **/
-  private int _marker = -20; // will be reset by calibration
   
   private int _turnDirection = 1;
 
@@ -41,12 +37,12 @@ public class Tracker
    *constructor - specifies which sensor ports are left and right
    */
 //	public Tracker( Pilot thePilot,SensorPort leftI,SensorPort rightI)
-  public Tracker(DifferentialPilot thePilot, LightSensor leftEye , LightSensor  rightEye)
+  public Tracker0(DifferentialPilot thePilot, LightSensor leftEye , LightSensor  rightEye)
   {
     pilot = thePilot;
     pilot.setTravelSpeed(20);
     pilot.setRotateSpeed(180);
-    pilot.setAcceleration(5000);
+    pilot.setAcceleration(8000);
     this.leftEye = leftEye;
     this.leftEye.setFloodlight(true);
     this.rightEye = rightEye;
@@ -65,33 +61,14 @@ public class Tracker
   public void trackLine()
   {
     float gain = 0.30f;// proportional control 1.0
-    pilot.forward();
-    boolean atMarker = false;
     int error = 0;// approximate offset from center of line, units about 0.12 mm
-
-    while (!atMarker)
-    {                                                 
+                                                 
       int lval = leftEye.getLightValue();
-      int rval = rightEye.getLightValue();
-      LCD.drawInt(lval,4, 0, 3);
-      LCD.drawInt(rval,4, 8, 3);
-      atMarker = (Math.min(lval, rval) < _marker);
-      if (!atMarker)
-      {
+      int rval = rightEye.getLightValue(); 
         error = CLDistance(lval, rval);
-        int control = (int) (gain * error );
-        LCD.drawInt(control, 4, 12, 3);
+        int control = 0; // do better
+
         pilot.steer(control);
-      } else
-      {
-        float advance = 8.5f; // distance from light censor to wheel base
-        float markerSize = 4;
-        Sound.playTone(1000, 100);
-        atMarker = true;
-        pilot.travel(advance,true);// let the navigator do something before stopping
-        while(pilot.getMovementIncrement()< markerSize); //sensor is past the marker
-      }
-    }
   }
 
   /**
@@ -102,40 +79,10 @@ public class Tracker
    */
   int CLDistance(int left, int right)
   {
-    int zone = 90;  // so bright that sensor is not seeing the line
-    int dist = 0;
-    
-    if (left > right +60)    _turnDirection = -1;  //turn away from light
-    else if(right > left + 60) _turnDirection = 1;
-   
-    if (left < zone && right < zone)   dist = right - left;  // both sensors see line   
-    else dist = _turnDirection * (right + left);
-    LCD.drawInt(left,4,0,1);
-    LCD.drawInt(right,3, 5, 1);
-    LCD.drawInt(dist, 4,10, 1);
-    LCD.drawInt(_turnDirection,2,14,1);
-    return dist;
+     return 0;
   }
 
-  /**
-  Turn to line at angle (multiple of 90 degrees) from current heading<br>
-  motors stop on exit if arg non zero, else no motor change;
-   */
-  public void turn(int angle)
-  {
-    if (angle == 0)
-    {
-      return;
-    } else
-    {
-      while (pilot.isMoving())
-      {
-        Thread.yield();
-      }
-    }
-    pilot.rotate(angle * 90);
-  }
-
+ 
   public void stop()
   {
     pilot.stop();
@@ -187,42 +134,12 @@ public class Tracker
         {
           rightEye.calibrateHigh();
           leftEye.calibrateHigh();
-        } else
-        {
-          _marker = leftEye.getLightValue() / 2;
-        }
+        } 
         while (0 < Button.readButtons())
         {
           Thread.yield();//button released
         }
-        try
-        {
-          DataOutputStream dos = new DataOutputStream(new FileOutputStream(data));
-          dos.writeInt(leftEye.getLow());
-          dos.writeInt(rightEye.getLow());
-          dos.writeInt(leftEye.getHigh());
-          dos.writeInt(rightEye.getHigh());
-          dos.writeInt(_marker);
-          dos.flush();
-          dos.close();
-        } catch (IOException ioe)
-        {
-        }
-      }
-    } else
-    {
-      try
-      {
-        DataInputStream dis = new DataInputStream(new FileInputStream(data));
-        leftEye.setLow(dis.readInt());
-        rightEye.setLow(dis.readInt());
-        leftEye.setHigh(dis.readInt());
-        rightEye.setHigh(dis.readInt());
-        _marker = dis.readInt();
-      } catch (IOException ioe)
-      {
-      }
-     LCD.clearDisplay();
+       
     }
     while (0 == Button.readButtons())// while no press
     {
@@ -234,6 +151,7 @@ public class Tracker
       LCD.refresh();
     }
     LCD.clear();
+  }
   }
 
 }

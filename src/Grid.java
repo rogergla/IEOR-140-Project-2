@@ -85,9 +85,8 @@ public class Grid
  *returns the neighbor of aNode; the  direction is a number (0,1,2,3) <BR>
  * multiple of 90 degrees from the X axis.  direction 0 is +X, direction 1 is +Y etc
  * If out of bounds, the neighbor is  null
-          * @param aNode 
-          * @param direction of the neighbor
-          * @return  
+      * @param  node  the node
+      * @param direction of the neighbor
  */
 	public Node neighbor(Node aNode, int direction)
 	{
@@ -106,17 +105,11 @@ public class Grid
 
 /**
 * sets where the robot is trying to go
-         * @param x 
-         * @param y 
-         */
+*/
 	public void setDestination(int x,int y)
 	{
 	   destination = nodes[x][y];
 	   recalc();
 	}
-        /**
-         * 
-         * @return
-         */
-        public Node getDestination(){return destination;}
+	public Node getDestination(){return destination;}
 }

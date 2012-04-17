@@ -28,10 +28,7 @@ set by blocked()
 */
   	private boolean blocked = false;
 
-        /**
-         * 
-         */
-        public static final int BIG = 99; // infinity in the grid
+	public static final int BIG = 99; // infinity in the grid
 /**
  * row and column index of my location in grid
 */
@@ -64,17 +61,12 @@ set by blocked()
 *prepare for shortest path calculation; called by Grid;
      * sets the mode distance to a big number
 */
-        /**
-         * 
-         */
-        public void reset (){_distance = BIG;}	//indicates shortest distance not yet known
+	public void reset (){_distance = BIG;}	//indicates shortest distance not yet known
 
 /**
 * updates distance if parameter  d   is smaller than current value, in which case return true <br>
 * indicating node should be added to list.
-         * @param distance
-         * @return  
-         */
+*/
 	public boolean newDistance (int distance)
 	{
 		if (blocked) return false;
@@ -93,11 +85,7 @@ set by blocked()
 		blocked = true;
 		_distance = BIG;
 	}
-        /**
-         * 
-         * @return
-         */
-        public boolean isBlocked(){return blocked;}
+	public boolean isBlocked(){return blocked;}
 
 /**
 * resets blocked flag
